@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Database error{% endblock %}
+{% block content %}
+<h1>Can't reach the database</h1>
+<p class="lead">Check that MySQL is running (XAMPP → Start MySQL) and that you've imported <code>schema.sql</code>.</p>
+<pre class="err">{{ message }}</pre>
+{% endblock %}

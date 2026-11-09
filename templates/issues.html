@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Issue &amp; return{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Issue &amp; return</h1>
+  <a class="btn primary" href="{{ url_for('issue_book') }}">Issue a book</a>
+</div>
+
+<nav class="tabs" aria-label="Filter loans">
+  {% for key, label in [('all','All'),('active','On loan'),('overdue','Overdue'),('returned','Returned')] %}
+    <a href="{{ url_for('issues', status=key) }}" {% if status == key %}class="on" aria-current="page"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</nav>
+<p class="hint">Fine: Tk {{ fine_per_day }} for each day a book is kept past its due date.</p>
+
+{% if issues %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Book</th><th>Member</th><th>Issued</th><th>Due</th><th>Returned</th><th>Status</th><th>Fine</th><th></th></tr></thead>
+  <tbody>
+  {% for i in issues %}
+    <tr>
+      <td>{{ i.title }}</td>
+      <td>{{ i.name }}</td>
+      <td class="num">{{ i.issue_date.strftime('%d %b %Y') }}</td>
+      <td class="num">{{ i.due_date.strftime('%d %b %Y') }}</td>
+      <td class="num">{{ i.return_date.strftime('%d %b %Y') if i.return_date else '–' }}</td>
+      <td><span class="tag {{ i.status }}">{{ {'active':'On loan','overdue':'Overdue','returned':'Returned'}[i.status] }}</span></td>
+      <td class="num">{{ ('Tk %d' % i.fine_amt) if i.fine_amt else '–' }}</td>
+      <td class="actions">
+        {% if not i.return_date %}
+        <form method="post" action="{{ url_for('return_book', issue_id=i.issue_id) }}">
+          <button class="btn small">Mark returned</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+  <p class="empty">No loans in this view.</p>
+{% endif %}
+{% endblock %}

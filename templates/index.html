@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Today at the desk</h1>
+  <a class="btn primary" href="{{ url_for('issue_book') }}">Issue a book</a>
+</div>
+
+<section class="stats" aria-label="Library totals">
+  <div><b>{{ stats.on_loan }}</b><span>on loan</span></div>
+  <div class="{{ 'bad' if stats.overdue else '' }}"><b>{{ stats.overdue }}</b><span>overdue</span></div>
+  <div><b>{{ stats.titles }}</b><span>titles ({{ stats.copies }} copies)</span></div>
+  <div><b>{{ stats.members }}</b><span>members</span></div>
+  <div><b>Tk {{ '%d'|format(stats.fines) }}</b><span>fines charged</span></div>
+</section>
+
+<div class="two-col">
+  <section>
+    <h2>Overdue</h2>
+    {% if overdue %}
+    <table>
+      <thead><tr><th>Book</th><th>Member</th><th>Days late</th><th>Fine</th><th></th></tr></thead>
+      <tbody>
+      {% for r in overdue %}
+        <tr>
+          <td>{{ r.title }}</td><td>{{ r.name }}</td>
+          <td>{{ r.days_late }}</td><td>Tk {{ r.fine_amt }}</td>
+          <td class="actions">
+            <form method="post" action="{{ url_for('return_book', issue_id=r.issue_id) }}"><button class="btn small">Mark returned</button></form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+      <p class="empty">Nothing is overdue.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Recent activity</h2>
+    {% if recent %}
+    <ul class="feed">
+      {% for r in recent %}
+        <li>
+          <span><b>{{ r.name }}</b> {{ 'returned' if r.return_date else 'borrowed' }} {{ r.title }}</span>
+          <time>{{ (r.return_date or r.issue_date).strftime('%d %b') }}</time>
+        </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+      <p class="empty">No loans yet. <a href="{{ url_for('issue_book') }}">Issue the first book.</a></p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

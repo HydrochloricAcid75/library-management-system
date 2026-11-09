@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit book' if editing else 'Add book' }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>{{ 'Edit book' if editing else 'Add book' }}</h1></div>
+
+<form class="form" method="post">
+  <label>Title
+    <input name="title" value="{{ book.title }}" required maxlength="200" autofocus>
+  </label>
+  <label>Author
+    <input name="author" value="{{ book.author }}" required maxlength="120">
+  </label>
+  <div class="row">
+    <label>ISBN
+      <input name="isbn" value="{{ book.isbn }}" required maxlength="20">
+    </label>
+    <label>Number of copies
+      <input name="total_copies" type="number" min="1" value="{{ book.total_copies }}" required>
+    </label>
+  </div>
+  <label>Category
+    <input name="category" value="{{ book.category }}" required maxlength="60" list="cats">
+    <datalist id="cats">{% for c in categories %}<option value="{{ c }}">{% endfor %}</datalist>
+  </label>
+  <div class="form-actions">
+    <button class="btn primary">{{ 'Save changes' if editing else 'Add book' }}</button>
+    <a href="{{ url_for('books') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

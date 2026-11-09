@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Books{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Books</h1>
+  <a class="btn primary" href="{{ url_for('add_book') }}">Add book</a>
+</div>
+
+<form class="search" method="get" role="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search title, author, ISBN or category" aria-label="Search books">
+  <button class="btn">Search</button>
+  {% if q %}<a href="{{ url_for('books') }}">Clear</a>{% endif %}
+</form>
+
+{% if books %}
+<div class="table-wrap">
+<table>
+  <thead><tr><th>Title</th><th>Author</th><th>ISBN</th><th>Category</th><th>Available</th><th></th></tr></thead>
+  <tbody>
+  {% for b in books %}
+    <tr>
+      <td class="spine" style="--h: {{ b.category|hue }}">{{ b.title }}</td>
+      <td>{{ b.author }}</td>
+      <td class="num">{{ b.isbn }}</td>
+      <td>{{ b.category }}</td>
+      <td>
+        {% if b.available_copies == 0 %}<span class="tag overdue">All on loan</span>
+        {% else %}{{ b.available_copies }} of {{ b.total_copies }}{% endif %}
+      </td>
+      <td class="actions">
+        <a class="btn small" href="{{ url_for('edit_book', book_id=b.book_id) }}">Edit</a>
+        <form method="post" action="{{ url_for('delete_book', book_id=b.book_id) }}"
+              onsubmit="return confirm('Delete “{{ b.title|replace("'", "")|replace('"', '') }}”?')">
+          <button class="btn small danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+  <p class="empty">{% if q %}No books match “{{ q }}”.{% else %}The catalogue is empty. <a href="{{ url_for('add_book') }}">Add the first book.</a>{% endif %}</p>
+{% endif %}
+{% endblock %}

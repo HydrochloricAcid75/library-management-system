@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Issue a book{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Issue a book</h1></div>
+
+{% if not books %}
+  <p class="empty">Every book is on loan right now, or the catalogue is empty. <a href="{{ url_for('add_book') }}">Add a book.</a></p>
+{% elif not members %}
+  <p class="empty">Add a member before issuing books. <a href="{{ url_for('add_member') }}">Add member.</a></p>
+{% else %}
+<form class="form" method="post">
+  <label>Book
+    <select name="book_id" required>
+      <option value="" disabled selected>Choose a book</option>
+      {% for b in books %}
+        <option value="{{ b.book_id }}">{{ b.title }} – {{ b.author }} ({{ b.available_copies }} available)</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Member
+    <select name="member_id" required>
+      <option value="" disabled selected>Choose a member</option>
+      {% for m in members %}
+        <option value="{{ m.member_id }}">{{ m.name }} ({{ m.member_type }})</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Due date
+    <input type="date" name="due_date" value="{{ default_due.isoformat() }}" min="{{ today.isoformat() }}" required>
+    <small>Default loan period is {{ loan_days }} days.</small>
+  </label>
+  <div class="form-actions">
+    <button class="btn primary">Issue book</button>
+    <a href="{{ url_for('issues') }}">Cancel</a>
+  </div>
+</form>
+{% endif %}
+{% endblock %}
